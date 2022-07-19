@@ -1,0 +1,175 @@
+---
+###############################################################################
+# Notes:
+#
+###############################################################################
+version: '3.8'
+services:
+  gitea:
+    # Docs: https://docs.gitea.io/en-us/install-with-docker/
+    image: gitea/gitea:1.16.9
+    container_name: gitea
+    volumes:
+      - /docker/data/gitea:/data
+      - /docker/data/traefik/ssl/sites/gitea:/data/gitea/https:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    healthcheck:
+      test: curl -sk 'https://localhost/api/healthz' | grep -c 'pass' || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    ports:
+      - 22:22
+      - 443:443
+      # - 3000:3000
+      # - 80:80
+    environment:
+    # Docs: https://docs.gitea.io/en-us/config-cheat-sheet
+      USER_UID: 1007
+      USER_GID: 1007
+      # GITEA__REPOSITORY__
+      GITEA__REPOSITORY__PREFERRED_LICENSES: 'Unlicense,Apache License 2.0,MIT License' # Preferred Licenses to place at the top of the list. Name must match file name in options/license or custom/options/license.
+      GITEA__REPOSITORY__ENABLE_PUSH_CREATE_USER: 'true' # Default false; Allow users to push local repositories to Gitea and have them automatically created for a user.
+      GITEA__REPOSITORY__ENABLE_PUSH_CREATE_ORG: 'true' # Default false; Allow users to push local repositories to Gitea and have them automatically created for an org.
+      GITEA__REPOSITORY__DEFAULT_BRANCH: 'main' # Default branch name of all repositories.
+      # GITEA__REPOSITORY_0X2E_UPLOAD__  (GITEA_REPOSITORY.UPLOAD__)
+      GITEA__REPOSITORY_0X2E_UPLOAD__FILE_MAX_SIZE: 100 # Default 3; Max size of each file in megabytes.
+      GITEA__REPOSITORY_0X2E_UPLOAD__FILE_MAX_FILES: 20 # Default 5; Max number of files per upload
+      # GITEA__UI__
+      GITEA__UI__DEFAULT_THEME: 'arc-green' # Default 'auto'; [auto, gitea, arc-green]: Set the default theme for the Gitea install.
+      GITEA__UI__THEME_COLOR_META_TAG: '#29ABE2' # Default '#6cc644'; Value of theme-color meta tag, used by Android >= 5.0. An invalid color like “none” or “disable” will have the default style. More info: https://developers.google.com/web/updates/2014/11/Support-for-theme-color-in-Chrome-39-for-Android
+      # GITEA__UI_0X2E_META__ (GITEA__UI.META__)
+      GITEA__UI_0X2E_META__AUTHOR: ${UI_AUTHOR:?VAR-FAIL} # Default 'Gitea - Git with a cup of tea'; Author meta tag of the homepage.
+      GITEA__UI_0X2E_META__DESCRIPTION: ${UI_DESCRIPTION:?VAR-FAIL} # Default 'Gitea (Git with a cup of tea) is a painless self-hosted Git service written in Go'; Description meta tag of the homepage.
+      GITEA__UI_0X2E_META__KEYWORDS: ${UI_KEYWORDS:-go,git,self-hosted,gitea} # Default 'go,git,self-hosted,gitea'; Keywords meta tag of the homepage.
+      # GITEA__SERVER__
+      GITEA__SERVER__PROTOCOL: 'https' # Default 'http'; [http, https, fcgi, http+unix, fcgi+unix]
+      GITEA__SERVER__DOMAIN: ${SERVER_DOMAIN:?VAR-FAIL} # Default 'localhost'; Domain name of this server.
+      GITEA__SERVER__HTTP_PORT: 443 # Default 3000; HTTP listen port.
+      GITEA__SERVER__OFFLINE_MODE: 'true' # Default 'false'; Disables use of CDN for static files and Gravatar for profile pictures.
+      GITEA__SERVER__CERT_FILE: 'https/crt.pem' # Default 'https/cert.pem'; Cert file path used for HTTPS. When chaining, the server certificate must come first, then intermediate CA certificates (if any). This is ignored if ENABLE_ACME=true. From 1.11 paths are relative to CUSTOM_PATH.
+      GITEA__SERVER__KEY_FILE: 'https/key.pem' # Default 'https/key.pem' Key file path used for HTTPS. This is ignored if ENABLE_ACME=true. From 1.11 paths are relative to CUSTOM_PATH.
+      GITEA__SERVER__ENABLE_GZIP: 'true' # Default 'false'; Enable gzip compression for runtime-generated content, static resources excluded.
+      GITEA__SERVER__LANDING_PAGE: 'login' # Default 'home'; Landing page for unauthenticated users [home, explore, organizations, login, custom]. Where custom would instead be any URL such as “/org/repo” or even https://anotherwebsite.com
+      GITEA__SERVER__LFS_START_SERVER: 'true' # Default 'false'; Enables Git LFS support.
+      # GITEA__SERVER__LFS_JWT_SECRET: ${SERVER_LFS_JWT_SECRET:?VAR-FAIL} # Default '<empty>'; LFS authentication secret, change this a unique string.
+      # GITEA__SECURITY__
+      GITEA__SECURITY__ONLY_ALLOW_PUSH_IF_GITEA_ENVIRONMENT_SET: 'false' # Default 'true'; Set to false to allow local users to push to gitea-repositories without setting up the Gitea
+      GITEA__SECURITY__MIN_PASSWORD_LENGTH: 16 # Default 6; Minimum password length for new users.
+      GITEA__SECURITY__PASSWORD_COMPLEXITY: 'lower,upper,digit,spec' # Default 'off'; lower,upper,digit,spec,off
+      GITEA__SECURITY__PASSWORD_CHECK_PWN: 'true' # Default  'false'; Check HaveIBeenPwned to see if a password has been exposed.
+      # GITEA__OPENID__
+      GITEA__OPENID__ENABLE_OPENID_SIGNIN: 'false' # Default 'false'; Allow authentication in via OpenID.
+      # GITEA__OAUTH2_CLIENT__
+      GITEA__OAUTH2_CLIENT__ENABLE_AUTO_REGISTRATION: 'true' # Default 'false'; Automatically create user accounts for new oauth2 users.
+      # GITEA__SERVICE__
+      GITEA__SERVICE__DEFAULT_KEEP_EMAIL_PRIVATE: 'true' # Default false; By default set users to keep their email address private.
+      GITEA__SERVICE__DEFAULT_USER_VISIBILITY: 'private' # Default public; Set default visibility mode for users, either “public”, “limited” or “private”.
+      GITEA__SERVICE__ALLOW_ONLY_EXTERNAL_REGISTRATION: 'true' # Default false; Set to true to force registration only using third-party services.
+      # GITEA__WEBHOOK__
+      GITEA__WEBHOOK__ALLOWED_HOST_LIST: '*' # Default 'external'; Comma separated list of:
+        # Built-in networks:
+        #     loopback: 127.0.0.0/8 for IPv4 and ::1/128 for IPv6, localhost is included.
+        #     private: RFC 1918 (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) and RFC 4193 (FC00::/7). Also called LAN/Intranet.
+        #     external: A valid non-private unicast IP, you can access all hosts on public internet.
+        #     *: All hosts are allowed.
+        # CIDR list: 1.2.3.0/8 for IPv4 and 2001:db8::/32 for IPv6
+        # Wildcard hosts: *.mydomain.com, 192.168.100.*
+      # GITEA__MAILER__
+      GITEA__MAILER__ENABLED: 'true' # Default false; Enable to use a mail service.
+      GITEA__MAILER__HOST: 'smtp.gmail.com:587' # SMTP mail host address and port (example: smtp.gitea.io:587).
+      GITEA__MAILER__FROM: ${MAILER_FROM:?VAR-FAIL} # Mail from address, RFC 5322. This can be just an email address, or the “Name” <email@example.com> format.
+      GITEA__MAILER__USER: ${MAILER_USER:?VAR-FAIL} # Username of mailing user (usually the sender’s e-mail address).
+      GITEA__MAILER__PASSWD: ${MAILER_PASSWD:?VAR-FAIL} # Password of mailing user. Use `your password` for quoting if you use special characters in the password.
+      # # GITEA__PICTURE__
+      GITEA__PICTURE__DISABLE_GRAVATAR: 'true' # Default false; Enable this to use local avatars only.
+      GITEA__PICTURE__ENABLE_FEDERATED_AVATAR: 'false' # Enable support for federated avatars (see http://www.libravatar.org).
+      # # GITEA__LOG__
+      GITEA__LOG__LEVEL: 'Info' # General log level. [Trace, Debug, Info, Warn, Error, Critical, Fatal, None]
+      # # GITEA__MIGRATIONS__
+      GITEA__MIGRATIONS__ALLOW_LOCALNETWORKS: 'true' # Default false; Allow private addresses defined by RFC 1918, RFC 1122, RFC 4632 and RFC 4291
+      # # GITEA__FEDERATION__
+      GITEA__FEDERATION__ENABLED: 'false' # Enable/Disable federation capabilities
+      # # GITEA__LFS__
+      GITEA__LFS__STORAGE_TYPE: 'minio' # Default local; Storage type for lfs, local for local disk or minio for s3 compatible object storage service or other name defined with [storage.xxx]
+      GITEA__LFS__SERVE_DIRECT: 'true' # Default false: Allows the storage driver to redirect to authenticated URLs to serve files directly. Currently, only Minio/S3 is supported via signed URLs, local does nothing.
+      GITEA__LFS__MINIO_ENDPOINT: ${MINIO_ENDPOINT:?VAR-FAIL} # Default localhost:9000; Minio endpoint to connect only available when STORAGE_TYPE is minio
+      GITEA__LFS__MINIO_ACCESS_KEY_ID: ${MINIO_KEY_ID:?VAR-FAIL} # Minio accessKeyID to connect only available when STORAGE_TYPE is minio
+      GITEA__LFS__MINIO_SECRET_ACCESS_KEY: ${MINIO_SECRET_ACCESS_KEY:?VAR-FAIL} # Minio secretAccessKey to connect only available when STORAGE_TYPE is minio
+      GITEA__LFS__MINIO_BUCKET: 'gitea' # Minio bucket to store the lfs only available when STORAGE_TYPE is minio
+      GITEA__LFS__MINIO_LOCATION: ${MINIO_LOCATION:?VAR-FAIL} # Minio location to create bucket only available when STORAGE_TYPE is minio
+      GITEA__LFS__MINIO_BASE_PATH: 'lfs/' # Minio base path on the bucket only available when STORAGE_TYPE is minio
+      GITEA__LFS__MINIO_USE_SSL: 'true' # Default false; Minio enabled ssl only available when STORAGE_TYPE is minio
+      # # GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__ (GITEA__STORAGE.REPO-ARCHIVE__)
+      GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__STORAGE_TYPE: 'minio' # Default local; Storage type for repo archive, local for local disk or minio for s3 compatible object storage service or other name defined with [storage.xxx]
+      GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__SERVE_DIRECT: 'true' # Default false; Allows the storage driver to redirect to authenticated URLs to serve files directly. Currently, only Minio/S3 is supported via signed URLs, local does nothing.
+      GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__MINIO_ENDPOINT: ${MINIO_ENDPOINT:?VAR-FAIL} # Minio endpoint to connect only available when STORAGE_TYPE is minio
+      GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__MINIO_ACCESS_KEY_ID: ${MINIO_KEY_ID:?VAR-FAIL} # Minio accessKeyID to connect only available when STORAGE_TYPE is minio
+      GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__MINIO_SECRET_ACCESS_KEY: ${MINIO_SECRET_ACCESS_KEY:?VAR-FAIL} # Minio secretAccessKey to connect only available when STORAGE_TYPE is minio
+      GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__MINIO_BUCKET: 'gitea' # Minio bucket to store the lfs only available when STORAGE_TYPE is minio
+      GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__MINIO_LOCATION: ${MINIO_LOCATION:?VAR-FAIL} # Default us-east-1; Minio location to create bucket only available when STORAGE_TYPE is minio
+      GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__MINIO_BASE_PATH: 'repo-archive/' # Minio base path on the bucket only available when STORAGE_TYPE is minio
+      GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__MINIO_USE_SSL: 'true' # Default false; Minio enabled ssl only available when STORAGE_TYPE is minio
+      # GITEA__OTHER__
+      GITEA__OTHER__SHOW_FOOTER_VERSION: 'false' # Default true; Show Gitea and Go version information in the footer.
+      GITEA__OTHER__SHOW_FOOTER_TEMPLATE_LOAD_TIME: 'false' # Default true; Show time of template execution in the footer.
+      GITEA__OTHER__SHOW_FOOTER_BRANDING: 'false' # Show Gitea branding in the footer.
+
+#######################
+## Optional Settings ##
+#######################
+# # GITEA__SECURITY__
+# GITEA__SECURITY__LOGIN_REMEMBER_DAYS: '7' # Default 7
+# GITEA__SECURITY__INSTALL_LOCK: 'true' # Default false
+
+# # GITEA__OAUTH2_CLIENT__
+# GITEA__OAUTH2_CLIENT__OPENID_CONNECT_SCOPES: '<empty>' # List of additional openid connect scopes. (openid is implicitly added)
+# GITEA__OAUTH2_CLIENT__USERNAME: 'nickname' # The source of the username for new oauth2 accounts:
+#     # userid - use the userid / sub attribute
+#     # nickname - use the nickname attribute
+#     # email - use the username part of the email attribute
+# GITEA__OAUTH2_CLIENT__UPDATE_AVATAR: 'false' # Update avatar if available from oauth2 provider. Update will be performed on each login.
+
+# # GITEA__SERVICE__
+# GITEA__SERVICE__DISABLE_REGISTRATION: 'true' # Default false; Disable registration, after which only admin can create accounts for users.
+# GITEA__SERVICE__REGISTER_MANUAL_CONFIRM: 'false' # Enable this to manually confirm new registrations. Requires REGISTER_EMAIL_CONFIRM to be disabled.
+# GITEA__SERVICE__ENABLE_REVERSE_PROXY_AUTHENTICATION: 'false' # Enable this to allow reverse proxy authentication.
+# GITEA__SERVICE__ENABLE_REVERSE_PROXY_AUTO_REGISTRATION: 'false' # Enable this to allow auto-registration for reverse authentication.
+# GITEA__SERVICE__ENABLE_REVERSE_PROXY_EMAIL: 'false' # Enable this to allow to auto-registration with a provided email rather than a generated email.
+# GITEA__SERVICE__ENABLE_USER_HEATMAP: 'true' # Enable this to display the heatmap on users profiles.
+# GITEA__SERVICE__ENABLE_TIMETRACKING: 'true' # Enable Timetracking feature.
+# GITEA__SERVICE__DEFAULT_ENABLE_TIMETRACKING: 'true' # Allow repositories to use timetracking by default.
+# GITEA__SERVICE__SHOW_MILESTONES_DASHBOARD_PAGE: 'true' # Enable this to show the milestones dashboard page - a view of all the user’s milestones
+# GITEA__SERVICE__ALLOW_ONLY_INTERNAL_REGISTRATION: 'false' # Set to true to force registration only via Gitea.
+
+# # GITEA__WEBHOOK__
+# GITEA__WEBHOOK__SKIP_TLS_VERIFY: 'false' # Allow insecure certification.
+
+# # GITEA__METRICS__
+# GITEA__METRICS__ENABLED: 'true' # Default false; Enables /metrics endpoint for prometheus.
+# GITEA__METRICS__ENABLED_ISSUE_BY_LABEL: 'false' # Enable issue by label metrics with format gitea_issues_by_label{label="bug"} 2.
+# GITEA__METRICS__ENABLED_ISSUE_BY_REPOSITORY: 'false' # Enable issue by repository metrics with format gitea_issues_by_repository{repository="org/repo"} 5.
+# GITEA__METRICS__TOKEN: '<empty>' # You need to specify the token, if you want to include in the authorization the metrics . The same token need to be used in prometheus parameters bearer_token or bearer_token_file.
+
+# # GITEA__OAUTH2__
+# GITEA__OAUTH2__JWT_SECRET: '<empty>' # OAuth2 authentication secret for access and refresh tokens, change this to a unique string. This setting is only needed if JWT_SIGNING_ALGORITHM is set to HS256, HS384 or HS512.
+
+# # GITEA__TIME__
+# GITEA__TIME__FORMAT: Time format to display on UI. i.e. RFC1123 or 2006-01-02 15:04:05
+# GITEA__TIME__DEFAULT_UI_LOCATION: Default location of time on the UI, so that we can display correct user’s time on UI. i.e. Shanghai/Asia
+
+# # GITEA__LFS__
+# GITEA__LFS__PATH: './data/lfs' # Where to store LFS files, only available when STORAGE_TYPE is local. If not set it fall back to deprecated LFS_CONTENT_PATH value in [server] section.
+
+# GITEA__STORAGE__
+# GITEA__STORAGE__SERVE_DIRECT: 'false' # Default false; Allows the storage driver to redirect to authenticated URLs to serve files directly. Currently, only Minio/S3 is supported via signed URLs, local does nothing.
+# GITEA__STORAGE__MINIO_ENDPOINT: 'localhost:9000' # Default localhost:9000; Minio endpoint to connect only available when STORAGE_TYPE is minio
+# GITEA__STORAGE__MINIO_ACCESS_KEY_ID: '' # Minio accessKeyID to connect only available when STORAGE_TYPE is minio
+# GITEA__STORAGE__MINIO_SECRET_ACCESS_KEY: '' # Minio secretAccessKey to connect only available when STORAGE_TYPE is minio
+# GITEA__STORAGE__MINIO_BUCKET: 'gitea' # Minio bucket to store the data only available when STORAGE_TYPE is minio
+# GITEA__STORAGE__MINIO_LOCATION: 'us-east-1' # Default us-east-1; Minio location to create bucket only available when STORAGE_TYPE is minio
+# GITEA__STORAGE__MINIO_USE_SSL: 'false' # Default false; Minio enabled ssl only available when STORAGE_TYPE is minio
+
+# # GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__ (GITEA__STORAGE.REPO-ARCHIVE__)
+# GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__PATH: './data/repo-archive' # Where to store archive files, only available when STORAGE_TYPE is local.

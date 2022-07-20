@@ -6,7 +6,7 @@ services:
     image:  renovate/renovate:32.118
     container_name: renovate
     restart: 'unless-stopped'
-    command: /data/wait ${WAIT:-10m} # Run 'renovate' every $WAIT s/m/h/d
+    command: /data/wait ${WAIT:-30m} # Run 'renovate' every $WAIT s/m/h/d
     volumes:
       - /docker/data/renovate:/data
     environment:
@@ -21,10 +21,10 @@ services:
       RENOVATE_BASE_DIR: '/data/repo-data' # Default /tmp/renovate
       RENOVATE_LOG_FILE: '/data/renovate.log'
       RENOVATE_GIT_PRIVATE_KEY: "${GIT_PGP:?VAR-FAIL}"
-      # LOG_LEVEL: 'debug' # Default info; info,debug,trace
+      # LOG_LEVEL: 'debug' # Default info; trace,debug,info,warn,error,fatal
       # RENOVATE_DRY_RUN: 'full' # null,extract,lookup.full
       # RENOVATE_CONFIG_FILE: "/data/renovate-config.js"
-      # RENOVATE_LOG_FILE_LEVEL: debug # Default debug; info,debug,trace
+      # RENOVATE_LOG_FILE_LEVEL: debug # Default debug; trace,debug,info,warn,error,fatal
       # RENOVATE_PRIVATE_KEY_PATH: '/data/gpg/renovate-private-key.asc'
       # RENOVATE_EXECUTION_TIMEOUT: 1440 # Default 15
       # RENOVATE_FORK_MODE: false # Default false

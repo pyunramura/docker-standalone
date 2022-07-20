@@ -1,0 +1,32 @@
+---
+version: '3.8'
+services:
+  renovate:
+    # Docs: https://docs.renovatebot.com/self-hosted-configuration
+    image:  renovate/renovate:32.118
+    container_name: renovate
+    restart: 'unless-stopped'
+    command: /data/wait ${WAIT:-10m} # Run 'renovate' every $WAIT s/m/h/d
+    volumes:
+      - /docker/data/renovate:/data
+    environment:
+      RENOVATE_AUTODISCOVER: 'true'
+      RENOVATE_PLATFORM: 'gitea'
+      RENOVATE_ENDPOINT: "${ENDPOINT:?VAR-FAIL}"
+      RENOVATE_GIT_AUTHOR: "${GIT_AUTHOR:?VAR-FAIL}"
+      RENOVATE_TOKEN: "${GIT_TOKEN:?VAR-FAIL}"
+      GITHUB_COM_TOKEN: "${GITHUB_TOKEN:?VAR-FAIL}"
+      RENOVATE_PERSIST_REPO_DATA: 'true' # Default false
+      RENOVATE_REPOSITORY_CACHE: 'enabled' # Default disabled; disabled, enabled, reset
+      RENOVATE_BASE_DIR: '/data/repo-data' # Default /tmp/renovate
+      RENOVATE_LOG_FILE: '/data/renovate.log'
+      RENOVATE_GIT_PRIVATE_KEY: "${GIT_PGP:?VAR-FAIL}"
+      # LOG_LEVEL: 'debug' # Default info; info,debug,trace
+      # RENOVATE_DRY_RUN: 'full' # null,extract,lookup.full
+      # RENOVATE_CONFIG_FILE: "/data/renovate-config.js"
+      # RENOVATE_LOG_FILE_LEVEL: debug # Default debug; info,debug,trace
+      # RENOVATE_PRIVATE_KEY_PATH: '/data/gpg/renovate-private-key.asc'
+      # RENOVATE_EXECUTION_TIMEOUT: 1440 # Default 15
+      # RENOVATE_FORK_MODE: false # Default false
+      # RENOVATE_GITHUB_TOKEN_WARN: true # Default true
+      # RENOVATE_ONBOARDING: true # Default true

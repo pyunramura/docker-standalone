@@ -3,7 +3,7 @@ version: '3.8'
 services:
   renovate:
     # Docs: https://docs.renovatebot.com/self-hosted-configuration
-    image:  renovate/renovate:32.118
+    image:  renovate/renovate:32.119.2-slim
     container_name: renovate
     restart: 'unless-stopped'
     command: /data/wait ${WAIT:-30m} # Run 'renovate' every $WAIT s/m/h/d

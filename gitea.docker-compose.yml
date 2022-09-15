@@ -7,7 +7,7 @@ version: '3.8'
 services:
   gitea:
     # Docs: https://docs.gitea.io/en-us/install-with-docker/
-    image: gitea/gitea:1.17.0-rc1
+    image: gitea/gitea:1.17.2
     container_name: gitea
     volumes:
       - /docker/data/gitea:/data

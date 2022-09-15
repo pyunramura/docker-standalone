@@ -6,10 +6,11 @@ services:
     image:  renovate/renovate:32.195.5-slim
     container_name: renovate
     restart: 'unless-stopped'
-    command: /data/wait ${WAIT:-30m} # Run 'renovate' every $WAIT s/m/h/d
+    command: ["/bin/sh", "-c", "while : ; do renovate ; sleep $${WAIT} ; done"]
     volumes:
       - /docker/data/renovate:/data
     environment:
+      WAIT: "${WAIT:-30m}"
       RENOVATE_AUTODISCOVER: 'true'
       RENOVATE_PLATFORM: 'gitea'
       RENOVATE_ENDPOINT: "${ENDPOINT:?VAR-FAIL}"

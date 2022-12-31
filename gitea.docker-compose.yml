@@ -78,7 +78,8 @@ services:
         # Wildcard hosts: *.mydomain.com, 192.168.100.*
       # GITEA__MAILER__
       GITEA__MAILER__ENABLED: 'true' # Default false; Enable to use a mail service.
-      GITEA__MAILER__HOST: 'smtp.gmail.com:587' # SMTP mail host address and port (example: smtp.gitea.io:587).
+      GITEA__MAILER__SMTP_ADDR: 'smtp.gmail.com' # SMTP mail host address (example: smtp.gitea.io).
+      GITEA__MAILER__SMTP_PORT: '587' # SMTP mail host port (example: 587).
       GITEA__MAILER__FROM: ${MAILER_FROM:?VAR-FAIL} # Mail from address, RFC 5322. This can be just an email address, or the “Name” <email@example.com> format.
       GITEA__MAILER__USER: ${MAILER_USER:?VAR-FAIL} # Username of mailing user (usually the sender’s e-mail address).
       GITEA__MAILER__PASSWD: ${MAILER_PASSWD:?VAR-FAIL} # Password of mailing user. Use `your password` for quoting if you use special characters in the password.

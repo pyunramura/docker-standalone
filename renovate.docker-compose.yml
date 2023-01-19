@@ -3,7 +3,7 @@ version: '3.8'
 services:
   renovate:
     # Docs: https://docs.renovatebot.com/self-hosted-configuration
-    image:  renovate/renovate:34.105.0-slim
+    image:  renovate/renovate:34.106.0-slim
     container_name: renovate
     restart: 'unless-stopped'
     command: ["/bin/sh", "-c", "while : ; do renovate ; sleep $${WAIT} ; done"]

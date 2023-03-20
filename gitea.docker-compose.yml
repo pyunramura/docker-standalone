@@ -116,7 +116,9 @@ services:
       GITEA__OTHER__SHOW_FOOTER_VERSION: 'false' # Default true; Show Gitea and Go version information in the footer.
       GITEA__OTHER__SHOW_FOOTER_TEMPLATE_LOAD_TIME: 'false' # Default true; Show time of template execution in the footer.
       GITEA__OTHER__SHOW_FOOTER_BRANDING: 'false' # Show Gitea branding in the footer.
-
+      # GITEA__ACTIONS__
+      GITEA__ACTIONS__ENABLED: 'true' # Default false; Enable/Disable actions capabilities.
+      
 #######################
 ## Optional Settings ##
 #######################
@@ -174,3 +176,6 @@ services:
 
 # # GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__ (GITEA__STORAGE.REPO-ARCHIVE__)
 # GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__PATH: './data/repo-archive' # Where to store archive files, only available when STORAGE_TYPE is local.
+
+# GITEA__ACTIONS__
+# GITEA__ACTIONS__DEFAULT_ACTIONS_URL: 'https://gitea.com' # Default https://gitea.com; Default address to get action plugins, e.g. the default value means downloading from “https://gitea.com/actions/checkout” for “uses: actions/checkout@v3”

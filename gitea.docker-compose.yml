@@ -38,7 +38,6 @@ services:
       GITEA__REPOSITORY_0X2E_UPLOAD__FILE_MAX_FILES: 20 # Default 5; Max number of files per upload
       # GITEA__UI__
       GITEA__UI__DEFAULT_THEME: 'arc-green' # Default 'auto'; [auto, gitea, arc-green]: Set the default theme for the Gitea install.
-      GITEA__UI__THEME_COLOR_META_TAG: '#29ABE2' # Default '#6cc644'; Value of theme-color meta tag, used by Android >= 5.0. An invalid color like “none” or “disable” will have the default style. More info: https://developers.google.com/web/updates/2014/11/Support-for-theme-color-in-Chrome-39-for-Android
       # GITEA__UI_0X2E_META__ (GITEA__UI.META__)
       GITEA__UI_0X2E_META__AUTHOR: ${UI_AUTHOR:?VAR-FAIL} # Default 'Gitea - Git with a cup of tea'; Author meta tag of the homepage.
       GITEA__UI_0X2E_META__DESCRIPTION: ${UI_DESCRIPTION:?VAR-FAIL} # Default 'Gitea (Git with a cup of tea) is a painless self-hosted Git service written in Go'; Description meta tag of the homepage.
@@ -115,7 +114,6 @@ services:
       # GITEA__OTHER__
       GITEA__OTHER__SHOW_FOOTER_VERSION: 'false' # Default true; Show Gitea and Go version information in the footer.
       GITEA__OTHER__SHOW_FOOTER_TEMPLATE_LOAD_TIME: 'false' # Default true; Show time of template execution in the footer.
-      GITEA__OTHER__SHOW_FOOTER_BRANDING: 'false' # Show Gitea branding in the footer.
       # GITEA__ACTIONS__
       GITEA__ACTIONS__ENABLED: 'true' # Default false; Enable/Disable actions capabilities.
       

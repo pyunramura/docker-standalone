@@ -9,6 +9,7 @@ services:
     # Docs: https://docs.gitea.io/en-us/install-with-docker/
     image: gitea/gitea:1.21.8
     container_name: gitea
+    restart: always
     volumes:
       - /docker/data/gitea:/data
       - /docker/data/traefik/ssl/sites/gitea:/data/gitea/https:ro
@@ -92,25 +93,25 @@ services:
       # # GITEA__FEDERATION__
       GITEA__FEDERATION__ENABLED: 'false' # Enable/Disable federation capabilities
       # # GITEA__LFS__
-      GITEA__LFS__STORAGE_TYPE: 'minio' # Default local; Storage type for lfs, local for local disk or minio for s3 compatible object storage service or other name defined with [storage.xxx]
-      GITEA__LFS__SERVE_DIRECT: 'true' # Default false: Allows the storage driver to redirect to authenticated URLs to serve files directly. Currently, only Minio/S3 is supported via signed URLs, local does nothing.
-      GITEA__LFS__MINIO_ENDPOINT: ${MINIO_ENDPOINT:?VAR-FAIL} # Default localhost:9000; Minio endpoint to connect only available when STORAGE_TYPE is minio
-      GITEA__LFS__MINIO_ACCESS_KEY_ID: ${MINIO_KEY_ID:?VAR-FAIL} # Minio accessKeyID to connect only available when STORAGE_TYPE is minio
-      GITEA__LFS__MINIO_SECRET_ACCESS_KEY: ${MINIO_SECRET_ACCESS_KEY:?VAR-FAIL} # Minio secretAccessKey to connect only available when STORAGE_TYPE is minio
-      GITEA__LFS__MINIO_BUCKET: 'gitea' # Minio bucket to store the lfs only available when STORAGE_TYPE is minio
-      GITEA__LFS__MINIO_LOCATION: ${MINIO_LOCATION:?VAR-FAIL} # Minio location to create bucket only available when STORAGE_TYPE is minio
-      GITEA__LFS__MINIO_BASE_PATH: 'lfs/' # Minio base path on the bucket only available when STORAGE_TYPE is minio
-      GITEA__LFS__MINIO_USE_SSL: 'true' # Default false; Minio enabled ssl only available when STORAGE_TYPE is minio
+      # GITEA__LFS__STORAGE_TYPE: 'minio' # Default local; Storage type for lfs, local for local disk or minio for s3 compatible object storage service or other name defined with [storage.xxx]
+      # GITEA__LFS__SERVE_DIRECT: 'true' # Default false: Allows the storage driver to redirect to authenticated URLs to serve files directly. Currently, only Minio/S3 is supported via signed URLs, local does nothing.
+      # GITEA__LFS__MINIO_ENDPOINT: ${MINIO_ENDPOINT:?VAR-FAIL} # Default localhost:9000; Minio endpoint to connect only available when STORAGE_TYPE is minio
+      # GITEA__LFS__MINIO_ACCESS_KEY_ID: ${MINIO_KEY_ID:?VAR-FAIL} # Minio accessKeyID to connect only available when STORAGE_TYPE is minio
+      # GITEA__LFS__MINIO_SECRET_ACCESS_KEY: ${MINIO_SECRET_ACCESS_KEY:?VAR-FAIL} # Minio secretAccessKey to connect only available when STORAGE_TYPE is minio
+      # GITEA__LFS__MINIO_BUCKET: 'gitea' # Minio bucket to store the lfs only available when STORAGE_TYPE is minio
+      # GITEA__LFS__MINIO_LOCATION: ${MINIO_LOCATION:?VAR-FAIL} # Minio location to create bucket only available when STORAGE_TYPE is minio
+      # GITEA__LFS__MINIO_BASE_PATH: 'lfs/' # Minio base path on the bucket only available when STORAGE_TYPE is minio
+      # GITEA__LFS__MINIO_USE_SSL: 'true' # Default false; Minio enabled ssl only available when STORAGE_TYPE is minio
       # # GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__ (GITEA__STORAGE.REPO-ARCHIVE__)
-      GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__STORAGE_TYPE: 'minio' # Default local; Storage type for repo archive, local for local disk or minio for s3 compatible object storage service or other name defined with [storage.xxx]
-      GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__SERVE_DIRECT: 'true' # Default false; Allows the storage driver to redirect to authenticated URLs to serve files directly. Currently, only Minio/S3 is supported via signed URLs, local does nothing.
-      GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__MINIO_ENDPOINT: ${MINIO_ENDPOINT:?VAR-FAIL} # Minio endpoint to connect only available when STORAGE_TYPE is minio
-      GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__MINIO_ACCESS_KEY_ID: ${MINIO_KEY_ID:?VAR-FAIL} # Minio accessKeyID to connect only available when STORAGE_TYPE is minio
-      GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__MINIO_SECRET_ACCESS_KEY: ${MINIO_SECRET_ACCESS_KEY:?VAR-FAIL} # Minio secretAccessKey to connect only available when STORAGE_TYPE is minio
-      GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__MINIO_BUCKET: 'gitea' # Minio bucket to store the lfs only available when STORAGE_TYPE is minio
-      GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__MINIO_LOCATION: ${MINIO_LOCATION:?VAR-FAIL} # Default us-east-1; Minio location to create bucket only available when STORAGE_TYPE is minio
-      GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__MINIO_BASE_PATH: 'repo-archive/' # Minio base path on the bucket only available when STORAGE_TYPE is minio
-      GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__MINIO_USE_SSL: 'true' # Default false; Minio enabled ssl only available when STORAGE_TYPE is minio
+      # GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__STORAGE_TYPE: 'minio' # Default local; Storage type for repo archive, local for local disk or minio for s3 compatible object storage service or other name defined with [storage.xxx]
+      # GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__SERVE_DIRECT: 'true' # Default false; Allows the storage driver to redirect to authenticated URLs to serve files directly. Currently, only Minio/S3 is supported via signed URLs, local does nothing.
+      # GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__MINIO_ENDPOINT: ${MINIO_ENDPOINT:?VAR-FAIL} # Minio endpoint to connect only available when STORAGE_TYPE is minio
+      # GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__MINIO_ACCESS_KEY_ID: ${MINIO_KEY_ID:?VAR-FAIL} # Minio accessKeyID to connect only available when STORAGE_TYPE is minio
+      # GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__MINIO_SECRET_ACCESS_KEY: ${MINIO_SECRET_ACCESS_KEY:?VAR-FAIL} # Minio secretAccessKey to connect only available when STORAGE_TYPE is minio
+      # GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__MINIO_BUCKET: 'gitea' # Minio bucket to store the lfs only available when STORAGE_TYPE is minio
+      # GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__MINIO_LOCATION: ${MINIO_LOCATION:?VAR-FAIL} # Default us-east-1; Minio location to create bucket only available when STORAGE_TYPE is minio
+      # GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__MINIO_BASE_PATH: 'repo-archive/' # Minio base path on the bucket only available when STORAGE_TYPE is minio
+      # GITEA__STORAGE_0X2E_REPO_0X2D_ARCHIVE__MINIO_USE_SSL: 'true' # Default false; Minio enabled ssl only available when STORAGE_TYPE is minio
       # GITEA__OTHER__
       GITEA__OTHER__SHOW_FOOTER_VERSION: 'false' # Default true; Show Gitea and Go version information in the footer.
       GITEA__OTHER__SHOW_FOOTER_TEMPLATE_LOAD_TIME: 'false' # Default true; Show time of template execution in the footer.
